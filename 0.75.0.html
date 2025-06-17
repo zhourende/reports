@@ -1,0 +1,319 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>0.75.0版本Bug分析报告</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #4285f4;
+            --secondary-color: #ea4335;
+            --accent-color: #fbbc05;
+            --text-color: #333;
+            --light-bg: #f8f9fa;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+        }
+        
+        h1, h2, h3 {
+            color: var(--primary-color);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .report-date {
+            text-align: right;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+        
+        .overview-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        
+        .overview-card {
+            flex: 0 0 30%;
+            background: var(--light-bg);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s ease;
+        }
+        
+        .overview-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .overview-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+        
+        .overview-value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .chart-container {
+            display: flex;
+            margin-bottom: 30px;
+        }
+        
+        .chart-box {
+            flex: 1;
+            padding: 20px;
+            background: var(--light-bg);
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            box-shadow: var(--card-shadow);
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+        
+        th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        tr:hover {
+            background-color: var(--light-bg);
+        }
+        
+        .highlight {
+            color: var(--secondary-color);
+            font-weight: bold;
+        }
+        
+        .analysis-section {
+            background: var(--light-bg);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: var(--card-shadow);
+        }
+        
+        @media (max-width: 768px) {
+            .overview-card {
+                flex: 0 0 100%;
+            }
+            
+            .chart-container {
+                flex-direction: column;
+            }
+            
+            .chart-box {
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>0.75.0版本Bug分析报告</h1>
+    <div class="report-date">生成日期：2025-05-16</div>
+    
+    <h2>1. Bug总体概况</h2>
+    <div class="overview-container">
+        <div class="overview-card">
+            <div class="overview-title">Bug总数</div>
+            <div class="overview-value">908</div>
+        </div>
+        
+        <div class="overview-card">
+            <div class="overview-title">已解决Bug数</div>
+            <div class="overview-value">873 (96.15%)</div>
+        </div>
+        
+        <div class="overview-card">
+            <div class="overview-title">平均修复时长</div>
+            <div class="overview-value">1.66 天</div>
+        </div>
+        
+        <div class="overview-card">
+            <div class="overview-title">重新打开Bug数</div>
+            <div class="overview-value">115 (12.67%)</div>
+        </div>
+        
+        <div class="overview-card">
+            <div class="overview-title">A/B级Bug数</div>
+            <div class="overview-value">13 (1.43%)</div>
+        </div>
+        
+        <div class="overview-card">
+            <div class="overview-title">节日Bug数</div>
+            <div class="overview-value">327 (36.01%)</div>
+        </div>
+    </div>
+    
+    <h2>2. Bug解决结果分布</h2>
+    <div class="chart-container">
+        <div class="chart-box">
+            <canvas id="resolutionChart"></canvas>
+        </div>
+        <div class="chart-box">
+            <table>
+                <thead>
+                    <tr>
+                        <th>解决结果</th>
+                        <th>数量</th>
+                        <th>占比</th>
+                    </tr>
+                </thead>
+                <tbody>
+<tr><td>已解决</td><td>873</td><td>96.15%</td></tr><tr><td>未解决</td><td>1</td><td>0.11%</td></tr><tr><td>不能复现</td><td>17</td><td>1.87%</td></tr><tr><td>不解决</td><td>4</td><td>0.44%</td></tr><tr><td>重复提交</td><td>4</td><td>0.44%</td></tr><tr><td>非缺陷</td><td>9</td><td>0.99%</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <h2>3. 按处理人分组的Bug统计 (前30名)</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>处理人</th>
+                <th>数量</th>
+                <th>平均修复时长(天)</th>
+                <th>重开率</th>
+            </tr>
+        </thead>
+        <tbody>
+<tr><td>linkang</td><td>86</td><td>1.63</td><td>8.14%</td></tr><tr><td>zhanghaojie</td><td>85</td><td>1.50</td><td>9.41%</td></tr><tr><td>moqi</td><td>81</td><td>1.71</td><td>14.81%</td></tr><tr><td>zhangting1</td><td>62</td><td>1.02</td><td>11.29%</td></tr><tr><td>wangjiao</td><td>54</td><td>1.54</td><td>9.26%</td></tr><tr><td>wangzichen</td><td>52</td><td>1.27</td><td class="highlight">21.15%</td></tr><tr><td>hechao</td><td>44</td><td>1.93</td><td>9.09%</td></tr><tr><td>liulihui</td><td>43</td><td>1.15</td><td>18.60%</td></tr><tr><td>zhangzhichun</td><td>36</td><td>1.66</td><td>13.89%</td></tr><tr><td>lizhaoyu</td><td>34</td><td>1.18</td><td>11.76%</td></tr><tr><td>zhanghan</td><td>30</td><td>1.62</td><td class="highlight">20.00%</td></tr><tr><td>gongliang</td><td>28</td><td>2.34</td><td>10.71%</td></tr><tr><td>tianmingyue</td><td>27</td><td class="highlight">2.60</td><td>14.81%</td></tr><tr><td>zhouyaoxu</td><td>27</td><td>1.47</td><td>18.52%</td></tr><tr><td>liudejiang</td><td>27</td><td class="highlight">2.68</td><td>14.81%</td></tr><tr><td>xuconggan</td><td>23</td><td>1.10</td><td>13.04%</td></tr><tr><td>zhushihao1</td><td>23</td><td>0.50</td><td>4.35%</td></tr><tr><td>machao</td><td>19</td><td class="highlight">3.69</td><td>5.26%</td></tr><tr><td>lijiarui</td><td>17</td><td>1.63</td><td class="highlight">29.41%</td></tr><tr><td>fanglingjia</td><td>15</td><td>0.85</td><td>6.67%</td></tr><tr><td>gongrui</td><td>14</td><td>0.42</td><td>7.14%</td></tr><tr><td>cuizihang</td><td>14</td><td>2.15</td><td>7.14%</td></tr><tr><td>mouke</td><td>12</td><td class="highlight">5.50</td><td class="highlight">25.00%</td></tr><tr><td>zhengyongwei</td><td>11</td><td>1.55</td><td>9.09%</td></tr><tr><td>libaichuan</td><td>8</td><td class="highlight">2.39</td><td>12.50%</td></tr><tr><td>ligang</td><td>8</td><td>0.30</td><td>12.50%</td></tr><tr><td>tangjiajun</td><td>5</td><td>2.08</td><td class="highlight">40.00%</td></tr><tr><td>sunminghao</td><td>5</td><td>1.25</td><td>0.00%</td></tr><tr><td>wangran</td><td>4</td><td>2.04</td><td>0.00%</td></tr><tr><td>lizhuo1</td><td>4</td><td>0.14</td><td>0.00%</td></tr>
+        </tbody>
+    </table>
+    
+    <h2>4. 高优先级Bug分析 (A/B级)</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>处理人</th>
+                <th>数量</th>
+            </tr>
+        </thead>
+        <tbody>
+<tr><td>liulihui</td><td>2</td></tr><tr><td>gongrui</td><td>2</td></tr><tr><td>zhouyaoxu</td><td>2</td></tr><tr><td>moqi</td><td>1</td></tr><tr><td>wangjiao</td><td>1</td></tr><tr><td>zhanghaojie</td><td>1</td></tr><tr><td>ligang</td><td>1</td></tr><tr><td>linkang</td><td>1</td></tr><tr><td>zhangting1</td><td>1</td></tr><tr><td>lizhanbo</td><td>1</td></tr>
+        </tbody>
+    </table>
+    
+    <h2>5. 功能Bug分布</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>功能</th>
+                <th>Bug总数</th>
+                <th>A/B级Bug数</th>
+            </tr>
+        </thead>
+        <tbody>
+<tr><td>限时抢购</td><td>74</td><td>0</td></tr><tr><td>ac联赛优化</td><td>59</td><td>4</td></tr><tr><td>英雄演练</td><td>50</td><td>0</td></tr><tr><td>掉落转付费</td><td>49</td><td>0</td></tr><tr><td>宝箱大放送</td><td>47</td><td>0</td></tr><tr><td>75新机甲</td><td>47</td><td>0</td></tr><tr><td>战报优化</td><td>47</td><td>0</td></tr><tr><td>战车皮肤</td><td>45</td><td>0</td></tr><tr><td>对对碰优化</td><td>43</td><td>2</td></tr><tr><td>新版高级探测保底</td><td>42</td><td>4</td></tr><tr><td>红三代战装</td><td>37</td><td>0</td></tr><tr><td>拓荒节gacha</td><td>30</td><td>0</td></tr><tr><td>战车gacha</td><td>28</td><td>1</td></tr><tr><td>科技节套装</td><td>27</td><td>0</td></tr><tr><td>胶囊存储仓</td><td>20</td><td>0</td></tr><tr><td>挖矿BP</td><td>20</td><td>0</td></tr><tr><td>帮派运动会优化</td><td>17</td><td>0</td></tr><tr><td>kvk5优化</td><td>16</td><td>0</td></tr><tr><td>金头兑换</td><td>16</td><td>0</td></tr><tr><td>资源供应</td><td>15</td><td>0</td></tr><tr><td>围剿组队优化</td><td>15</td><td>0</td></tr><tr><td>T6冲刺</td><td>14</td><td>1</td></tr><tr><td>小额连充</td><td>12</td><td>0</td></tr><tr><td>12代打击手</td><td>10</td><td>0</td></tr><tr><td>任务奖励广告</td><td>10</td><td>0</td></tr><tr><td>资源特供</td><td>8</td><td>0</td></tr><tr><td>五月多条件连锁礼包</td><td>7</td><td>0</td></tr><tr><td>主城特效累充</td><td>6</td><td>0</td></tr><tr><td>跑马灯优化</td><td>6</td><td>1</td></tr><tr><td>收藏品成就奖励可领取提示强化</td><td>6</td><td>0</td></tr><tr><td>科技节套装覆盖S1-2</td><td>5</td><td>0</td></tr><tr><td>帮派聊天排序</td><td>5</td><td>0</td></tr><tr><td>线上问题</td><td>4</td><td>0</td></tr><tr><td>新机甲-蜘蛛</td><td>4</td><td>0</td></tr><tr><td>蜘蛛机甲配套</td><td>3</td><td>0</td></tr><tr><td>S300商店消耗</td><td>3</td><td>0</td></tr><tr><td>蜘蛛机甲配套活动</td><td>3</td><td>0</td></tr><tr><td>单笔充值</td><td>3</td><td>0</td></tr><tr><td>OAP累充</td><td>3</td><td>0</td></tr><tr><td>斗士特惠礼包</td><td>3</td><td>0</td></tr><tr><td>赛车玩法活动</td><td>3</td><td>0</td></tr><tr><td>蜘蛛机甲</td><td>2</td><td>0</td></tr><tr><td>节日累充</td><td>2</td><td>0</td></tr><tr><td>文件清理</td><td>2</td><td>0</td></tr><tr><td>机师框架活动</td><td>2</td><td>0</td></tr><tr><td>开工日礼包</td><td>2</td><td>0</td></tr><tr><td>五月gacha</td><td>2</td><td>0</td></tr><tr><td>解绳子</td><td>2</td><td>0</td></tr><tr><td>连塔</td><td>2</td><td>0</td></tr><tr><td>增加资源产出</td><td>2</td><td>0</td></tr><tr><td>战报可读性优化</td><td>2</td><td>0</td></tr><tr><td>强消耗优化</td><td>1</td><td>0</td></tr><tr><td>机甲</td><td>1</td><td>0</td></tr><tr><td>蜘蛛配套</td><td>1</td><td>0</td></tr><tr><td>5月活动</td><td>1</td><td>0</td></tr><tr><td>拓荒节充值活动</td><td>1</td><td>0</td></tr><tr><td>科技界套装</td><td>1</td><td>0</td></tr><tr><td>付费率宝箱</td><td>1</td><td>0</td></tr><tr><td>科技节套餐</td><td>1</td><td>0</td></tr><tr><td>新战装投放</td><td>1</td><td>0</td></tr><tr><td>拓荒节装饰</td><td>1</td><td>0</td></tr><tr><td>校场</td><td>1</td><td>0</td></tr><tr><td>行军表情</td><td>1</td><td>0</td></tr><tr><td>主城累充特效</td><td>1</td><td>0</td></tr><tr><td>三个累充活动</td><td>1</td><td>0</td></tr><tr><td>unity</td><td>1</td><td>0</td></tr><tr><td>更换头像弹窗</td><td>1</td><td>0</td></tr><tr><td>五月主城特效累充</td><td>1</td><td>0</td></tr><tr><td>五月bingo</td><td>1</td><td>0</td></tr><tr><td>活动</td><td>1</td><td>0</td></tr><tr><td>4月合服</td><td>1</td><td>0</td></tr><tr><td>AC联赛优化</td><td>1</td><td>0</td></tr><tr><td>盲盒机</td><td>1</td><td>0</td></tr><tr><td>战报显示优化</td><td>1</td><td>0</td></tr><tr><td>帮派聊天室排序</td><td>1</td><td>0</td></tr><tr><td>斗士语音</td><td>1</td><td>0</td></tr><tr><td>可训练兵种新增1013配置</td><td>1</td><td>0</td></tr>
+        </tbody>
+    </table>
+    
+    <h2>6. 版本Bug分析</h2>
+    
+    <div class="analysis-section">
+        <h3>6.1 版本Bug整体分析</h3>
+        <p>本版本共发现Bug 908 个，解决率达到 96.15%，平均修复时长 1.66 天。</p>
+        <p>Bug主要集中在以下功能模块：限时抢购, ac联赛优化, 英雄演练, 掉落转付费, 宝箱大放送，占比超过 30.73%。</p>
+        <p>Bug重开率为 12.67%，高优先级Bug(A/B级)占比 1.43%，主要分布在 ac联赛优化, 新版高级探测保底, 对对碰优化 等功能模块。</p>
+        <p>节日相关Bug占比 36.01%，表明核心业务功能稳定性需要进一步提升。</p>
+    </div>
+    
+    <div class="analysis-section">
+        <h3>6.2 关键问题分析</h3>
+        <p>高优先级Bug主要集中在 ac联赛优化, 新版高级探测保底, 对对碰优化 等模块，主要表现为界面显示错误、功能逻辑异常等问题。</p>
+        <p>核心功能模块 限时抢购 存在的问题最多，达到 74 个，其中高优先级Bug 0 个，需重点关注。</p>
+        <p>部分功能模块如 ac联赛优化, 对对碰优化, 新版高级探测保底 等存在潜在系统性问题，需要进行架构层面的优化。</p>
+        <p>Bug分布表明，用户体验和活动参与度可能会受到影响，特别是节日活动相关功能中的问题可能影响用户活跃度。</p>
+    </div>
+    
+    <div class="analysis-section">
+        <h3>6.3 修复效率分析</h3>
+        <p>处理人 linkang 处理的Bug数量最多，达到 86 个，平均修复时长 1.63 天。</p>
+        <p>团队平均修复时长为 1.66 天，重开率为 12.67%。修复时长最短的成员为 lizhuo1，值得分享其工作模式和经验。</p>
+        <p>团队协作中存在的瓶颈主要体现在高优先级Bug的协作处理上，平均修复时长较长的成员可能需要增强技术支持。</p>
+        <p>重开率较高的模块如 tangjiajun, lijiarui, mouke 处理的Bug需要更详细的测试用例和验收标准。</p>
+    </div>
+    
+    <div class="analysis-section">
+        <h3>6.4 问题原因推测</h3>
+        <ol>
+            <li><strong>界面显示问题</strong>：大量Bug涉及UI显示异常、文本错误等，可能是由于缺乏UI自动化测试和多语言适配不足导致。</li>
+            <li><strong>活动配置错误</strong>：特别是节日活动相关的Bug，多与配置数据不正确、活动逻辑不完善有关。</li>
+            <li><strong>跨服务协作问题</strong>：在跨服务场景下出现的Bug比例较高，表明服务间通信和状态同步存在问题。</li>
+            <li><strong>逻辑边界条件处理</strong>：许多Bug出现在特定条件组合下，表明代码对边界条件的处理不够完善。</li>
+            <li><strong>本地化问题</strong>：非中文环境下出现的Bug较多，多语言支持仍需加强。</li>
+        </ol>
+    </div>
+    
+    <div class="analysis-section">
+        <h3>6.5 改进建议</h3>
+        <ol>
+            <li><strong>加强UI自动化测试</strong>：建立更完善的UI自动化测试框架，特别是针对不同语言环境、不同设备分辨率下的显示效果测试。</li>
+            <li><strong>优化活动配置流程</strong>：建立活动配置审核机制，在活动上线前进行全面检查，避免配置错误。</li>
+            <li><strong>改进跨服务测试</strong>：加强跨服务的集成测试，模拟用户在不同服务间的切换场景，确保状态同步正确。</li>
+            <li><strong>建立更完善的边界测试用例</strong>：针对各功能模块，系统性地设计边界条件测试用例，提高代码对异常情况的处理能力。</li>
+            <li><strong>优化团队协作模式</strong>：建立复杂Bug的协作处理机制，提高高优先级Bug的修复效率，减少平均修复时长。</li>
+        </ol>
+    </div>
+    
+    <script>
+        // 解决结果分布饼图
+        const resolutionCtx = document.getElementById('resolutionChart').getContext('2d');
+        const resolutionChart = new Chart(resolutionCtx, {
+            type: 'pie',
+            data: {
+                labels: ['已解决', '未解决', '不能复现', '不解决', '重复提交', '非缺陷'],
+                datasets: [{
+                    data: [873, 1, 17, 4, 4, 9],
+                    backgroundColor: [
+                        '#4285f4', '#ea4335', '#fbbc05', '#34a853', '#46bdc6', '#9c27b0',
+                        '#2196f3', '#ff9800', '#795548', '#607d8b'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Bug解决结果分布'
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
